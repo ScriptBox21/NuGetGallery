@@ -52,5 +52,10 @@ namespace NuGet.Services.Entities
         /// All vulnerable packages should satisfy <see cref="PackageId"/> and <see cref="PackageVersionRange"/>.
         /// </remarks>
         public ICollection<Package> Packages { get; set; }
+
+        /// <summary>
+        /// A join table to connect the version range to a single package version
+        /// </summary>
+        public ICollection<VulnerablePackageVersionRangePackage> VulnerablePackageVersionRangePackages { get; set; }
     }
 }

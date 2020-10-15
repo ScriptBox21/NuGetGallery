@@ -688,6 +688,10 @@
                             {
                                 <th aria-hidden="true" abbr="Deprecation Information"></th>
                             }
+                            @if (Model.IsPackageVulnerabilitiesEnabled)
+                            {
+                                <th aria-hidden="true" abbr="Vulnerabilities Information"></th>
+                            }
                         </tr>
                     </thead>
                     <tbody class="no-border">
@@ -705,91 +709,106 @@
                             {
                                 rowCount++;
                                 @VersionListDivider(rowCount, versionsExpanded)
-                                <tr class="@(packageVersion.IsCurrent(Model) ? "bg-info" : null)">
-                                    <td>
-                                        <a href="@Url.Package(packageVersion)" title="@packageVersion.FullVersion">
-                                            @packageVersion.Version.Abbreviate(30)
-                                        </a>
-                                    </td>
-                                    <td>
-                                        @packageVersion.DownloadCount.ToNuGetNumberString()
-                                    </td>
-                                    <td>
-                                        <span data-datetime="@packageVersion.LastUpdated.ToString("O")">@packageVersion.LastUpdated.ToNuGetShortDateString()</span>
-                                        @if (packageVersion.PushedBy != null)
-                                        {
-                                            <text>
-                                                by <span title="@packageVersion.PushedBy">@packageVersion.PushedBy.Abbreviate(15)</span>
-                                            </text>
-                                        }
-                                    </td>
-                                    @if (packageVersion.CanDisplayPrivateMetadata)
-                                    {
-                                        var packageStatusSummary = packageVersion.PackageStatusSummary;
+                        <tr class="@(packageVersion.IsCurrent(Model) ? "bg-info" : null)">
+                            <td>
+                                <a href="@Url.Package(packageVersion)" title="@packageVersion.FullVersion">
+                                    @packageVersion.Version.Abbreviate(30)
+                                </a>
+                            </td>
+                            <td>
+                                @packageVersion.DownloadCount.ToNuGetNumberString()
+                            </td>
+                            <td>
+                                <span data-datetime="@packageVersion.LastUpdated.ToString("O")">@packageVersion.LastUpdated.ToNuGetShortDateString()</span>
+                                @if (packageVersion.PushedBy != null)
+                                {
+                                    <text>
+                                        by <span title="@packageVersion.PushedBy">@packageVersion.PushedBy.Abbreviate(15)</span>
+                                    </text>
+                                }
+                            </td>
+                            @if (packageVersion.CanDisplayPrivateMetadata)
+                            {
+                                var packageStatusSummary = packageVersion.PackageStatusSummary;
 
-                                        <td>
-                                            @if (packageStatusSummary == PackageStatusSummary.Listed ||
-                                                 packageStatusSummary == PackageStatusSummary.Unlisted)
-                                            {
-                                                <a href="@Url.ManagePackage(packageVersion)">@NuGetGallery.Helpers.EnumHelper.GetDescription(packageStatusSummary)</a>
-                                            }
-                                            else
-                                            {
-                                                @NuGetGallery.Helpers.EnumHelper.GetDescription(packageStatusSummary)
-                                            }
-                                        </td>
+                                <td>
+                                    @if (packageStatusSummary == PackageStatusSummary.Listed ||
+                                         packageStatusSummary == PackageStatusSummary.Unlisted)
+                                    {
+                                        <a href="@Url.ManagePackage(packageVersion)">@NuGetGallery.Helpers.EnumHelper.GetDescription(packageStatusSummary)</a>
                                     }
-
-                                    @if (Model.IsCertificatesUIEnabled)
+                                    else
                                     {
-                                        if (string.IsNullOrEmpty(packageVersion.SignatureInformation))
+                                        @NuGetGallery.Helpers.EnumHelper.GetDescription(packageStatusSummary)
+                                    }
+                                </td>
+                            }
+
+                            @if (Model.IsCertificatesUIEnabled)
+                            {
+                                if (string.IsNullOrEmpty(packageVersion.SignatureInformation))
+                                {
+                                    <td class="package-icon-cell" aria-hidden="true"></td>
+                                }
+                                else
+                                {
+                                    <td class="package-icon-cell">
+                                        <i class="ms-Icon ms-Icon--Ribbon package-icon" title="@packageVersion.SignatureInformation"></i>
+                                    </td>
+                                }
+                            }
+                            @if (Model.IsPackageDeprecationEnabled)
+                            {
+                                if (packageVersion.DeprecationStatus == PackageDeprecationStatus.NotDeprecated)
+                                {
+                                    <td class="package-icon-cell" aria-hidden="true"></td>
+                                }
+                                else
+                                {
+                                    var deprecationTitle = packageVersion.Version;
+                                    var isLegacy = packageVersion.DeprecationStatus.HasFlag(PackageDeprecationStatus.Legacy);
+                                    var hasCriticalBugs = packageVersion.DeprecationStatus.HasFlag(PackageDeprecationStatus.CriticalBugs);
+                                    if (hasCriticalBugs)
+                                    {
+                                        if (isLegacy)
                                         {
-                                            <td class="package-icon-cell" aria-hidden="true"></td>
+                                            deprecationTitle += " is deprecated because it's legacy and has critical bugs.";
                                         }
                                         else
                                         {
-                                            <td class="package-icon-cell">
-                                                    <i class="ms-Icon ms-Icon--Ribbon package-icon" title="@packageVersion.SignatureInformation"></i>
-                                            </td>
+                                            deprecationTitle += " is deprecated because it has critical bugs.";
                                         }
                                     }
-                                    @if (Model.IsPackageDeprecationEnabled)
+                                    else if (isLegacy)
                                     {
-                                        if (packageVersion.DeprecationStatus == PackageDeprecationStatus.NotDeprecated)
-                                        {
-                                            <td class="package-icon-cell" aria-hidden="true"></td>
-                                        }
-                                        else
-                                        {
-                                            var deprecationTitle = packageVersion.Version;
-                                            var isLegacy = packageVersion.DeprecationStatus.HasFlag(PackageDeprecationStatus.Legacy);
-                                            var hasCriticalBugs = packageVersion.DeprecationStatus.HasFlag(PackageDeprecationStatus.CriticalBugs);
-                                            if (hasCriticalBugs)
-                                            {
-                                                if (isLegacy)
-                                                {
-                                                    deprecationTitle += " is deprecated because it's legacy and has critical bugs.";
-                                                }
-                                                else
-                                                {
-                                                    deprecationTitle += " is deprecated because it has critical bugs.";
-                                                }
-                                            }
-                                            else if (isLegacy)
-                                            {
-                                                deprecationTitle += " is deprecated because it's legacy and no longer maintained.";
-                                            }
-                                            else
-                                            {
-                                                deprecationTitle += " is deprecated.";
-                                            }
-
-                                            <td class="package-icon-cell">
-                                                <i class="ms-Icon ms-Icon--Warning package-icon" title="@deprecationTitle"></i>
-                                            </td>
-                                        }
+                                        deprecationTitle += " is deprecated because it's legacy and no longer maintained.";
                                     }
-                                </tr>
+                                    else
+                                    {
+                                        deprecationTitle += " is deprecated.";
+                                    }
+
+                                    <td class="package-icon-cell">
+                                        <i class="ms-Icon ms-Icon--Warning package-icon" title="@deprecationTitle"></i>
+                                    </td>
+                                }
+                            }
+                            @if (Model.IsPackageVulnerabilitiesEnabled)
+                            {
+                                if (packageVersion.Vulnerabilities == null || !packageVersion.Vulnerabilities.Any())
+                                {
+                                    <td class="package-icon-cell" aria-hidden="true"></td>
+                                }
+                                else
+                                {
+                                    var vulnerabilityTitle = "Vulnerablities placeholder";
+
+                                    <td class="package-icon-cell">
+                                        <i class="ms-Icon ms-Icon--Warning package-icon" title="@vulnerabilityTitle"></i>
+                                    </td>
+                                }
+                            }
+                        </tr>
                             }
                             else if (packageVersion.Deleted && packageVersion.CanDisplayPrivateMetadata)
                             {

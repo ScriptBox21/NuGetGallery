@@ -22,6 +22,7 @@ namespace NuGetGallery
         DbSet<SymbolPackage> SymbolPackages { get; set; }
         DbSet<PackageVulnerability> Vulnerabilities { get; set; }
         DbSet<VulnerablePackageVersionRange> VulnerableRanges { get; set; }
+        DbSet<VulnerablePackageVersionRangePackage> VulnerableRangePackages { get; set; }
         DbSet<PackageRename> PackageRenames { get; set; }
 
         Task<int> SaveChangesAsync();

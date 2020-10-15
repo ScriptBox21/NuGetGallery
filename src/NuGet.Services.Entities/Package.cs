@@ -287,5 +287,10 @@ namespace NuGet.Services.Entities
         public bool HasEmbeddedIcon { get; set; }
 
         public EmbeddedReadmeFileType EmbeddedReadmeType { get; set; }
+
+        /// <summary>
+        /// A join table to connect a single package version to a vulnerable version range
+        /// </summary>
+        public ICollection<VulnerablePackageVersionRangePackage> VulnerablePackageVersionRangePackages { get; set; }
     }
 }

@@ -81,6 +81,7 @@ namespace NuGetGallery
         public DbSet<SymbolPackage> SymbolPackages { get; set; }
         public DbSet<PackageVulnerability> Vulnerabilities { get; set; }
         public DbSet<VulnerablePackageVersionRange> VulnerableRanges { get; set; }
+        public DbSet<VulnerablePackageVersionRangePackage> VulnerableRangePackages { get; set; }
         public DbSet<PackageRename> PackageRenames { get; set; }
 
         /// <summary>
@@ -490,6 +491,21 @@ namespace NuGetGallery
             modelBuilder.Entity<VulnerablePackageVersionRange>()
                 .HasIndex(pv => new { pv.VulnerabilityKey, pv.PackageId, pv.PackageVersionRange })
                 .IsUnique();
+
+            modelBuilder.Entity<VulnerablePackageVersionRangePackage>()
+                .HasKey(vpvrp => new { vpvrp.VulnerablePackageVersionRange_Key, vpvrp.Package_Key });
+
+            modelBuilder.Entity<VulnerablePackageVersionRangePackage>()
+                .HasRequired(vpvrp => vpvrp.VulnerablePackageVersionRange)
+                .WithMany(vpvr => vpvr.VulnerablePackageVersionRangePackages)
+                .HasForeignKey(vpvrp => vpvrp.VulnerablePackageVersionRange_Key)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<VulnerablePackageVersionRangePackage>()
+                .HasRequired(vpvrp => vpvrp.Package)
+                .WithMany(p => p.VulnerablePackageVersionRangePackages)
+                .HasForeignKey(vpvrp => vpvrp.Package_Key)
+                .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<PackageRename>()
                 .HasKey(r => r.Key)
