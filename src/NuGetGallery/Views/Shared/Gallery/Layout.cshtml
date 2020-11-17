@@ -32,21 +32,21 @@
     <![endif]-->
 
     @RenderSection("TopStyles", required: false)
-    @ViewHelpers.AnalyticsScript(ViewBag)
+    @* @ViewHelpers.AnalyticsScript(ViewBag) *@
     @RenderSection("TopScripts", required: false)
     @ViewHelpers.ReleaseMeta()
-    @ViewHelpers.InstrumentationScript(ViewBag)
+    @* @ViewHelpers.InstrumentationScript(ViewBag) *@
 </head>
 <body>
     @Html.Partial("Gallery/Header")
     <div id="skippedToContent">
     @RenderBody()
     </div>
-    @ViewHelpers.UsabillaButton(Url, ViewBag)
+    @* @ViewHelpers.UsabillaButton(Url, ViewBag) *@
     @Html.Partial("Gallery/Footer")
     @ViewHelpers.CookieComplianceScript()
     @Scripts.Render("~/Scripts/gallery/site.min.js")
     @RenderSection("BottomScripts", required: false)
-    @ViewHelpers.UsabillaScript(ViewBag)
+    @* @ViewHelpers.UsabillaScript(ViewBag) *@
 </body>
 </html>
